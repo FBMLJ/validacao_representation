@@ -18,7 +18,7 @@
     "typescript": "^5.6.3"
   },
   "dependencies": {
-    "class-transform": "^0.7.0",
+    "class-transformer": "^0.5.1",
     "projeto_erros_padroes": "github:FBMLJ/projeto_erros_padroes_typescript",
     "reflect-metadata": "^0.2.2"
   }

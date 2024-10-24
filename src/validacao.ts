@@ -1,6 +1,6 @@
 import { BadRequest } from "projeto_erros_padroes";
 import "reflect-metadata"
-
+import {plainToInstance} from "class-transformer"
 export interface MetadadosValidacao {
   nome?: string,
   descricao?: string,
@@ -38,11 +38,12 @@ function lidarReturnsTrue(obj: any, key: any, erro: BadRequest){
     }
 }
 
-export function validation(obj:any){
+export function validation<Type>(obj:Type, ctr: new()=> Type){
+  const novo_obj:any = plainToInstance(ctr, obj);
   const erro: BadRequest = new BadRequest();
-  for (const key of Object.keys(obj)) {
-    lidarIsNotNull(obj,key,erro);
-    lidarReturnsTrue(obj,key,erro)
+  for (const key of Object.keys(novo_obj)) {
+    lidarIsNotNull(novo_obj,key,erro);
+    lidarReturnsTrue(novo_obj,key,erro)
   }
   erro.throwIfErros();
 }
