@@ -1,0 +1,24 @@
+{
+  "name": "projeto_validacao",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "files": [
+    "./dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepublish": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.6.3"
+  },
+  "dependencies": {
+    "class-transform": "^0.7.0",
+    "projeto_erros_padroes": "github:FBMLJ/projeto_erros_padroes_typescript",
+    "reflect-metadata": "^0.2.2"
+  }
+}
