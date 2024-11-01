@@ -1,3 +1,4 @@
-import {notNull, returnsTrue, validation} from "./validacao";
+import {field, returnsTrue, validation} from "./validacao";
+import {generateSwaggerRepresentation} from "./swaggerRepresentation"
 
-export {notNull,returnsTrue, validation};
+export {field,returnsTrue, validation, generateSwaggerRepresentation};

@@ -8,42 +8,76 @@ export interface MetadadosValidacao {
   max?: number,
   min?:number
 }
-const KEY_IS_NOT_NULL = "validation:isNotEmpty"
-const KEY_RETURNS_TRUE = ""
 
-export function notNull(nomeCampo?: string){
-    return function (target: any, propertyKey: string) {
-        const metadados: MetadadosValidacao = {nome: nomeCampo ? nomeCampo : propertyKey};
-        Reflect.defineMetadata(KEY_IS_NOT_NULL, metadados, target, propertyKey);
+export interface MetadadadosField {
+  type: any,
+  descricao?: string,
+  patter?: string,
+  maxLength?: number,
+  minLength?: number,
+  example?: any,
+  required?: boolean,
+}
+
+export interface ReturnsTrueInterface {
+  funcionName: string,
+  descricaoErro: string
+}
+
+
+export function field(metadados: MetadadadosField){
+  return function (target: any, propertyKey: string) {
+      
+        
+        
+        // Se não houver nome nos metadados, usa o nome da propriedade
+        
+    
+        // Garantir que target.constructor.metadados está definido
+        if (!target.constructor.metadados) {
+          target.constructor.metadados = {};
+        }
+        target.constructor.metadados[propertyKey] = metadados;
     };
 }
 
 export function returnsTrue(descricao: string){
   return function(target: any, propertyKey: string){
-    const metadados: MetadadosValidacao = {descricao}
-    Reflect.defineMetadata(KEY_RETURNS_TRUE,metadados, target,propertyKey);
+    if (!target.constructor.returnsTrue)
+    target.constructor.returnsTrue  = [];
+    target.constructor.returnsTrue.push({ funcionName: propertyKey, descricaoErro: descricao} as ReturnsTrueInterface)
   }
 }
-function lidarIsNotNull(obj: any, key: any, erro: BadRequest){
-  const isNotEmpty:MetadadosValidacao = Reflect.getMetadata(KEY_IS_NOT_NULL, obj, key);
-    if (!!isNotEmpty && obj !== false  && !obj[key]){
-      erro.addObservacoes({descricao: `O campo ${isNotEmpty.nome} precisa ser preenchido`});
+function lidarIsNotNull(obj: any, label: string,metadado: MetadadadosField, erro: BadRequest){
+    const value = obj[label];
+    console.log(!value)
+    
+    if (!value && value !== false  && !!metadado.required){
+      erro.addObservacoes({descricao: `O campo ${label} precisa ser preenchido`});
     }
 }
 
-function lidarReturnsTrue(obj: any, key: any, erro: BadRequest){
-  const metadado:MetadadosValidacao = Reflect.getMetadata(KEY_RETURNS_TRUE, obj, key);
-    if (!!metadado && obj[key]() === false){
-      erro.addObservacoes({descricao: `${metadado.descricao}`});
+function lidarReturnsTrue(obj: any, metadado: ReturnsTrueInterface, erro: BadRequest){
+  
+    if (!!metadado && obj[metadado.funcionName]() === false){
+      erro.addObservacoes({descricao: `${metadado.descricaoErro}`});
     }
 }
 
 export function validation<Type>(obj:Type, ctr: new()=> Type){
   const novo_obj:any = plainToInstance(ctr, obj);
   const erro: BadRequest = new BadRequest();
-  for (const key of Object.keys(novo_obj)) {
-    lidarIsNotNull(novo_obj,key,erro);
-    lidarReturnsTrue(novo_obj,key,erro)
+  for (const fieldLabel in novo_obj.constructor.metadados){
+    lidarIsNotNull(novo_obj, fieldLabel,novo_obj.constructor.metadados[fieldLabel], erro);
   }
+  const returnsTrue:ReturnsTrueInterface[]= novo_obj.constructor.returnsTrue as ReturnsTrueInterface[]
+  if (returnsTrue)
+  returnsTrue.forEach((metadado)=>{
+    lidarReturnsTrue(obj,metadado , erro )
+  });
+
+  
+    
+  
   erro.throwIfErros();
 }
