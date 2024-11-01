@@ -1,4 +1,4 @@
 import {field, returnsTrue, validation} from "./validacao";
-import {generateSwaggerRepresentation} from "./swaggerRepresentation"
+import {generateSwaggerRepresentation, swaggerJsonDefinition} from "./swaggerRepresentation"
 
-export {field,returnsTrue, validation, generateSwaggerRepresentation};
+export {field,returnsTrue, validation, generateSwaggerRepresentation, swaggerJsonDefinition};
